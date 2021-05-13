@@ -1,0 +1,62 @@
+--- 
+title: "Poročilo pri predmetu Seminar"
+author: "Jaka Svetek"
+output:
+  html_document: default
+  pdf_document:
+    includes:
+      in_header: lib/styles.sty
+    latex_engine: xelatex
+runtime: shiny
+---
+
+```{r setup, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+
+# Uvoz vseh potrebnih knjižnic
+source("lib/libraries.r", encoding="UTF-8")
+source("funkcije/funkcije.r", encoding = "UTF-8")
+```
+
+# Tema
+
+Tema te seminarske naloge je s pomočjo simulacij ilustrirati, zakaj je s stališča zavarovalnice pomembno, da je premija strogo večja od pričakovane škode. 
+
+***
+
+# Predstavitev projekta in razlaga
+
+Zavarovalnice zaračunajo premijo za tveganje glede na škodo, ki se lahko zgodi in glede na verjetnost nesreče. Večja, kot je verjetnost, da se nesreča zgodi, večja je premija in večja kot je možna škoda, večja je premija. Zavarovanje je mogoče za mnogo različnih stvari z različnimi cenami in različnimi verjetnostmi nesreč. Če poznamo točno vrednost mogoče škode in točno verjetnost nesreče, lahko izračunamo pričakovano vrednost. Poštena zavarovalnica bi torej zaračunala za zavarovanje točno pričakovano vrednost nesreče. Cilj te naloge je pokazati, zakaj si nobena zavarovalnice (ne glede na začetni kapital) tega ne more privoščiti.
+
+V praksi je tako, da je možnost nesreče zelo majhna in zato je tudi cena zavarovanja relativno nizka. A ker se nesreča zgodi tako po redkokrat, se do takrat že nabere nekaj denarja. Poštena zavarovalnica bi bila torej taka, da nebi nič zaslužila, saj bi v času do nesreče v povprečju ravno nabrala dovolj denarja za škodo nesreče. Sistem zavarovanja lahko poenostavimo tako, da se vsak dan zgodi eden od dogodkov: nesreča se zgodi ali nesreča se ne zgodi. Strošek nesreče je 1, če pa se nesreča ne zgodi, pa zavarovalnica zasluži 1 (plačilo zavarovanja). Torej, če se nesreča zgodi, se ji kapital zmanjša za 1, če pa se ne zgodi, pa se ji poveča za 1. Če bi bila zavarovalnica poštena, bi bila v takem primeru verjetnost, da se zgodi nesreča točno 1/2. Pri simulaciji bomo "poštenost" oziroma premijo zavarovanja spreminjali z verjetnostjo nesreče.
+
+Tako lahko zdaj tvorimo slučajno spremenljivko X, ki z verjetnostjo p (verjetnost, da se nesreča ne zgodi) zavzame vrednost 1 in z verjetnosto 1-p (verjetnost, da se nesreča zgodi) -1. Tako definirana slučajna spremenljivka X je torej Bernoullijeva slučajna spremenljivka. Zavarovalnico opazujemo več dni in vsak dan se ali zgodi nesreča ali pa ne, neodvisno od ostalih dni. Torej je za več dni skupek neodvisnih Bernoullijevih slučajnih spremenljivk. Tako pa tvorimo binomsko porazdelitev.
+
+Zanima nas preživetje zavarovalnice. Preživetje pomeni, da ne propade oziroma ji kapital ne pade pod 0. Če zavarovalnici kapital pade na -1 pomeni, da je propadla. Ni važno, če bi zavarovalnici kasneje spet narasel kapital nad 0, če ji kadarkoli pade pod 0 je to totalen propad in nadaljni prihodki niso relavantni.
+
+***
+
+# Simulacija
+
+Pri simulacijah program sam izvede več naključnih neodvisnih poskusov.
+
+Pri prvi simulaciji opazujemo le eno zavarovalnico. Določimo začetni kapital zavarovalnice, koliko dni jo opazujemo in verjetnost, da se zgodi nesreča. Rezultat simulacije je ali končni kapital ali pa dan, v katerem je zavarovalnica propadla.
+
+Druga simulacija je podobna prvi s to razliko, da tu opazujemo več medsebojno neodvisnih zavarovalnic. Določimo število zavarovalnic in ostale parametre kot pri prvi simulaciji. Rezulat je število propadlih zavarovalnic.
+
+Tretja simulacija pa nam izriše kolikšen odstotek zavarovalnic propade za posamezen začetni kapital. V bistvu nam izriše graf verjetnosti propada v odvisnosti od začetnega kapitala. Vanjo vpišemo le parameter koliko dni jo opazujemo in kolikšna je verjetnost nesreče. Program naredi zelo veliko neodvisnih simulacij (da dobi čim boljši približek za izračunano verjetnost), zato lahko pri velikih številkah potrebuje več časa za izračun.
+
+```{r shiny, echo=FALSE}
+   shinyAppDir("shiny", options=list(width="100%", height=600))
+```
+
+***
+
+# Opazke simulacij
+
+V prvih dveh simulacijah lahko vidimo, da bo vsaka poštena zavarovalnica propadla neodvisno od začetnega kapitala. To lahko vidimo tako, da nastavimo na veliko število dni opazovanja. Ker je začetni kapital fiksen, se bo enkrat proti neskončnosti zgodilo, da bo le ta padel pod 0. Če pa le malo spremenimo verjetnost nesreče, torej da je premija le malo višja od pričakovane škode, pa verjetnost propada pada.
+
+Pri tretji simulaciji pa vidimo, kako hitro verjetnost propada pada v odvisnosti od začetnega kapitala. Kot je vidno iz grafa pada verjetnost propada v odvisnosti od začetnega kapitala geometrijsko. Še vedno pa velja, da bo poštena zavarovalnica propadla z verjetnostjo 1. Geometrijsko padanje se da tudi dokazati in ga bomo dokazali naslednje leto pri predmetu verjetnost z mero.
+
+
+
